@@ -1,49 +1,31 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// Define the size of the hash table
-#define TABLE_SIZE 10
+#define SIZE 10
 
-// Node structure for the linked list
 struct Node {
     int data;
     struct Node* next;
 };
 
-// Hash table structure
 struct HashTable {
-    struct Node* table[TABLE_SIZE];
+    struct Node* table[SIZE];
 };
 
-// Initialize the hash table
-void initializeHashTable(struct HashTable* hashTable) {
-    int i;
-    for (i = 0; i < TABLE_SIZE; i++) {
-        hashTable->table[i] = NULL;
-    }
-}
-
-// Hash function to determine the index in the hash table
 int hashFunction(int key) {
-    return key % TABLE_SIZE;
+    return key % SIZE;
 }
 
-// Insert a value into the hash table
-void insert(struct HashTable* hashTable, int value) {
-    // Create a new node
+void insert(struct HashTable* ht, int key) {
+    int index = hashFunction(key);
     struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
-    newNode->data = value;
+    newNode->data = key;
     newNode->next = NULL;
 
-    // Calculate the hash value
-    int index = hashFunction(value);
-
-    // Insert the node into the linked list at the calculated index
-    if (hashTable->table[index] == NULL) {
-        hashTable->table[index] = newNode;
+    if (ht->table[index] == NULL) {
+        ht->table[index] = newNode;
     } else {
-        // Handle collision by chaining
-        struct Node* current = hashTable->table[index];
+        struct Node* current = ht->table[index];
         while (current->next != NULL) {
             current = current->next;
         }
@@ -51,35 +33,37 @@ void insert(struct HashTable* hashTable, int value) {
     }
 }
 
-// Display the contents of the hash table
-void display(struct HashTable* hashTable) {
-    int i;
-    for (i = 0; i < TABLE_SIZE; i++) {
-        printf("Bucket %d: ", i);
-        struct Node* current = hashTable->table[i];
+void display(struct HashTable* ht) {
+    printf("Hash Table:\n");
+    for (int i = 0; i < SIZE; i++) {
+        printf("%d:", i);
+        struct Node* current = ht->table[i];
         while (current != NULL) {
-            printf("%d -> ", current->data);
+            printf(" %d", current->data);
             current = current->next;
         }
-        printf("NULL\n");
+        printf("\n");
     }
 }
 
 int main() {
-    struct HashTable hashTable;
-    initializeHashTable(&hashTable);
+    struct HashTable ht;
+    for (int i = 0; i < SIZE; i++) {
+        ht.table[i] = NULL;
+    }
 
-    // Insert values into the hash table
-    insert(&hashTable, 12);
-    insert(&hashTable, 22);
-    insert(&hashTable, 42);
-    insert(&hashTable, 7);
-    insert(&hashTable, 17);
-    insert(&hashTable, 27);
-    insert(&hashTable, 37);
+    int n;
+    printf("Enter the number of elements to insert: ");
+    scanf("%d", &n);
 
-    // Display the hash table
-    display(&hashTable);
+    printf("Enter the elements:\n");
+    for (int i = 0; i < n; i++) {
+        int key;
+        scanf("%d", &key);
+        insert(&ht, key);
+    }
+
+    display(&ht);
 
     return 0;
 }
