@@ -1,104 +1,84 @@
-// DFS algorithm in C
-
 #include <stdio.h>
 #include <stdlib.h>
 
-struct node {
-  int vertex;
-  struct node* next;
-};
+#define MAX_VERTICES 100
 
-struct node* createNode(int v);
+struct Node {
+    int data;
+    struct Node* next;
+};
 
 struct Graph {
-  int numVertices;
-  int* visited;
-
-  // We need int** to store a two dimensional array.
-  // Similary, we need struct node** to store an array of Linked lists
-  struct node** adjLists;
+    int vertices;
+    struct Node** adjacencyList;
+    int* visited;
 };
 
-// DFS algo
-void DFS(struct Graph* graph, int vertex) {
-  struct node* adjList = graph->adjLists[vertex];
-  struct node* temp = adjList;
-
-  graph->visited[vertex] = 1;
-  printf("Visited %d \n", vertex);
-
-  while (temp != NULL) {
-    int connectedVertex = temp->vertex;
-
-    if (graph->visited[connectedVertex] == 0) {
-      DFS(graph, connectedVertex);
-    }
-    temp = temp->next;
-  }
+struct Node* createNode(int data) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = data;
+    newNode->next = NULL;
+    return newNode;
 }
 
-// Create a node
-struct node* createNode(int v) {
-  struct node* newNode = malloc(sizeof(struct node));
-  newNode->vertex = v;
-  newNode->next = NULL;
-  return newNode;
-}
-
-// Create graph
 struct Graph* createGraph(int vertices) {
-  struct Graph* graph = malloc(sizeof(struct Graph));
-  graph->numVertices = vertices;
+    struct Graph* graph = (struct Graph*)malloc(sizeof(struct Graph));
+    graph->vertices = vertices;
+    graph->adjacencyList = (struct Node**)malloc(vertices * sizeof(struct Node*));
+    graph->visited = (int*)malloc(vertices * sizeof(int));
 
-  graph->adjLists = malloc(vertices * sizeof(struct node*));
-
-  graph->visited = malloc(vertices * sizeof(int));
-
-  int i;
-  for (i = 0; i < vertices; i++) {
-    graph->adjLists[i] = NULL;
-    graph->visited[i] = 0;
-  }
-  return graph;
-}
-
-// Add edge
-void addEdge(struct Graph* graph, int src, int dest) {
-  // Add edge from src to dest
-  struct node* newNode = createNode(dest);
-  newNode->next = graph->adjLists[src];
-  graph->adjLists[src] = newNode;
-
-  // Add edge from dest to src
-  newNode = createNode(src);
-  newNode->next = graph->adjLists[dest];
-  graph->adjLists[dest] = newNode;
-}
-
-// Print the graph
-void printGraph(struct Graph* graph) {
-  int v;
-  for (v = 0; v < graph->numVertices; v++) {
-    struct node* temp = graph->adjLists[v];
-    printf("\n Adjacency list of vertex %d\n ", v);
-    while (temp) {
-      printf("%d -> ", temp->vertex);
-      temp = temp->next;
+    for (int i = 0; i < vertices; ++i) {
+        graph->adjacencyList[i] = NULL;
+        graph->visited[i] = 0;
     }
-    printf("\n");
-  }
+
+    return graph;
+}
+
+void addEdge(struct Graph* graph, int start, int end) {
+    struct Node* newNode = createNode(end);
+    newNode->next = graph->adjacencyList[start];
+    graph->adjacencyList[start] = newNode;
+
+    // Uncomment the following lines if the graph is directed
+    // newNode = createNode(start);
+    // newNode->next = graph->adjacencyList[end];
+    // graph->adjacencyList[end] = newNode;
+}
+
+void DFS(struct Graph* graph, int vertex) {
+    printf("%d ", vertex);
+    graph->visited[vertex] = 1;
+
+    struct Node* temp = graph->adjacencyList[vertex];
+    while (temp != NULL) {
+        if (!graph->visited[temp->data]) {
+            DFS(graph, temp->data);
+        }
+        temp = temp->next;
+    }
 }
 
 int main() {
-  struct Graph* graph = createGraph(4);
-  addEdge(graph, 0, 1);
-  addEdge(graph, 0, 2);
-  addEdge(graph, 1, 2);
-  addEdge(graph, 2, 3);
+    int vertices, edges, start, end;
 
-  printGraph(graph);
+    printf("Enter the number of vertices: ");
+    scanf("%d", &vertices);
 
-  DFS(graph, 2);
+    printf("Enter the number of edges: ");
+    scanf("%d", &edges);
 
-  return 0;
+    struct Graph* graph = createGraph(vertices);
+
+    for (int i = 0; i < edges; ++i) {
+        printf("Enter edge (start end): ");
+        scanf("%d %d", &start, &end);
+        addEdge(graph, start, end);
+    }
+
+    printf("DFS Traversal starting from vertex 0: ");
+    DFS(graph, 0);
+    printf("\n");
+
+    return 0;
 }
