@@ -1,4 +1,3 @@
-// Write C/C++ program to perform various operations i.e., //insertions, updating height , verifying balance factor and perform rotations on AVL trees. Show final tree is balanced using solved example and given inputs.
 #include <stdio.h>
 #include <stdlib.h>
 
