@@ -1,46 +1,50 @@
-// Adjacency Matrix representation in C
-
 #include <stdio.h>
-#define V 4
 
-// Initialize the matrix to zero
-void init(int arr[][V]) {
-  int i, j;
-  for (i = 0; i < V; i++)
-    for (j = 0; j < V; j++)
-      arr[i][j] = 0;
-}
+#define MAX 100
 
-// Add edges
-void addEdge(int arr[][V], int i, int j) {
-  arr[i][j] = 1;
-  arr[j][i] = 1;
-}
+int graph[MAX][MAX];
 
-// Print the matrix
-void printAdjMatrix(int arr[][V]) {
-  int i, j;
-
-  for (i = 0; i < V; i++) {
-    printf("%d: ", i);
-    for (j = 0; j < V; j++) {
-      printf("%d ", arr[i][j]);
+void initializeGraph(int vertices) {
+    for (int i = 0; i < vertices; i++) {
+        for (int j = 0; j < vertices; j++) {
+            graph[i][j] = 0;
+        }
     }
-    printf("\n");
-  }
+}
+
+void addEdge(int start, int end) {
+    graph[start][end] = 1;
+    graph[end][start] = 1;
+}
+
+void printGraph(int vertices) {
+    printf("Adjacency Matrix Representation:\n");
+    for (int i = 0; i < vertices; i++) {
+        for (int j = 0; j < vertices; j++) {
+            printf("%d ", graph[i][j]);
+        }
+        printf("\n");
+    }
 }
 
 int main() {
-  int adjMatrix[V][V];
+    int vertices, edges;
+    printf("Enter the number of vertices: ");
+    scanf("%d", &vertices);
 
-  init(adjMatrix);
-  addEdge(adjMatrix, 0, 1);
-  addEdge(adjMatrix, 0, 2);
-  addEdge(adjMatrix, 1, 2);
-  addEdge(adjMatrix, 2, 0);
-  addEdge(adjMatrix, 2, 3);
+    initializeGraph(vertices);
 
-  printAdjMatrix(adjMatrix);
+    printf("Enter the number of edges: ");
+    scanf("%d", &edges);
 
-  return 0;
+    printf("Enter the edges (start end):\n");
+    for (int i = 0; i < edges; i++) {
+        int start, end;
+        scanf("%d %d", &start, &end);
+        addEdge(start, end);
+    }
+
+    printGraph(vertices);
+
+    return 0;
 }
