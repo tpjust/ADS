@@ -1,23 +1,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// Define the maximum size of the heap
 #define MAX_HEAP_SIZE 100
 
-// Structure for the binary heap
 struct Heap {
     int arr[MAX_HEAP_SIZE];
     int size;
 };
 
-// Function to swap two values in the heap
 void swap(int* a, int* b) {
     int temp = *a;
     *a = *b;
     *b = temp;
 }
 
-// Function to heapify the array (fix the heap property)
 void heapify(struct Heap* heap, int index) {
     int smallest = index;
     int leftChild = 2 * index + 1;
@@ -37,41 +33,34 @@ void heapify(struct Heap* heap, int index) {
     }
 }
 
-// Function to insert a new element into the heap
 void insert(struct Heap* heap, int value) {
     if (heap->size == MAX_HEAP_SIZE) {
         printf("Heap is full. Cannot insert.\n");
         return;
     }
 
-    // Insert the new element at the end
     int currentIndex = heap->size;
     heap->arr[currentIndex] = value;
     heap->size++;
 
-    // Fix the heap property by comparing the new element with its parent
     while (currentIndex > 0 && heap->arr[currentIndex] < heap->arr[(currentIndex - 1) / 2]) {
         swap(&heap->arr[currentIndex], &heap->arr[(currentIndex - 1) / 2]);
         currentIndex = (currentIndex - 1) / 2;
     }
 }
 
-// Function to delete the minimum element from the heap
 void deleteMin(struct Heap* heap) {
     if (heap->size == 0) {
         printf("Heap is empty. Cannot delete.\n");
         return;
     }
 
-    // Replace the root with the last element
     heap->arr[0] = heap->arr[heap->size - 1];
     heap->size--;
 
-    // Fix the heap property by heapifying from the root
     heapify(heap, 0);
 }
 
-// Function to print the elements of the heap
 void printHeap(struct Heap* heap) {
     printf("Heap: ");
     for (int i = 0; i < heap->size; i++) {
@@ -84,20 +73,23 @@ int main() {
     struct Heap heap;
     heap.size = 0;
 
-    // Insert elements into the heap
-    insert(&heap, 3);
-    insert(&heap, 2);
-    insert(&heap, 1);
-    insert(&heap, 5);
-    insert(&heap, 4);
+    int numElements, element;
 
-    // Print the heap
+    printf("Enter the number of elements to insert into the heap: ");
+    scanf("%d", &numElements);
+
+    printf("Enter the elements to insert into the heap:\n");
+    for (int i = 0; i < numElements; i++) {
+        scanf("%d", &element);
+        insert(&heap, element);
+    }
+
+    printf("Heap after insertion: ");
     printHeap(&heap);
 
-    // Delete the minimum element
     deleteMin(&heap);
 
-    // Print the heap after deletion
+    printf("Heap after deletion of minimum element: ");
     printHeap(&heap);
 
     return 0;
