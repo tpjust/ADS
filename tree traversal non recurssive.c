@@ -8,98 +8,9 @@ struct TreeNode {
 };
 
 struct StackNode {
-    struct TreeNode* tree_node;
+    struct TreeNode* treeNode;
     struct StackNode* next;
 };
-
-struct StackNode* createStackNode(struct TreeNode* node) {
-    struct StackNode* stackNode = (struct StackNode*)malloc(sizeof(struct StackNode));
-    stackNode->tree_node = node;
-    stackNode->next = NULL;
-    return stackNode;
-}
-
-void push(struct StackNode** top_ref, struct TreeNode* node) {
-    struct StackNode* stackNode = createStackNode(node);
-    stackNode->next = *top_ref;
-    *top_ref = stackNode;
-}
-
-int isEmpty(struct StackNode* top) {
-    return top == NULL;
-}
-
-struct TreeNode* pop(struct StackNode** top_ref) {
-    if (isEmpty(*top_ref))
-        return NULL;
-
-    struct StackNode* temp = *top_ref;
-    *top_ref = (*top_ref)->next;
-    struct TreeNode* popped = temp->tree_node;
-    free(temp);
-    return popped;
-}
-void inorderTraversal(struct TreeNode* root) {
-    if (root == NULL)
-        return;
-
-    struct TreeNode* current = root;
-    struct StackNode* stack = NULL;
-
-    while (current != NULL || !isEmpty(stack)) {
-        while (current != NULL) {
-            push(&stack, current);
-            current = current->left;
-        }
-
-        current = pop(&stack);
-        printf("%d ", current->data);
-
-        current = current->right;
-    }
-}
-
-void preorderTraversal(struct TreeNode* root) {
-    if (root == NULL)
-        return;
-
-    struct StackNode* stack = NULL;
-    push(&stack, root);
-
-    while (!isEmpty(stack)) {
-        struct TreeNode* current = pop(&stack);
-        printf("%d ", current->data);
-
-        if (current->right)
-            push(&stack, current->right);
-        if (current->left)
-            push(&stack, current->left);
-    }
-}
-
-void postorderTraversal(struct TreeNode* root) {
-    if (root == NULL)
-        return;
-
-    struct StackNode* stack1 = NULL;
-    struct StackNode* stack2 = NULL;
-    push(&stack1, root);
-
-    while (!isEmpty(stack1)) {
-        struct TreeNode* current = pop(&stack1);
-        push(&stack2, current);
-
-        if (current->left)
-            push(&stack1, current->left);
-        if (current->right)
-            push(&stack1, current->right);
-    }
-
-    while (!isEmpty(stack2)) {
-        struct TreeNode* temp = pop(&stack2);
-        printf("%d ", temp->data);
-    }
-}
 
 struct TreeNode* createNode(int data) {
     struct TreeNode* newNode = (struct TreeNode*)malloc(sizeof(struct TreeNode));
@@ -109,52 +20,179 @@ struct TreeNode* createNode(int data) {
     return newNode;
 }
 
-struct TreeNode* insert(struct TreeNode* root, int data) {
-    if (root == NULL)
-        return createNode(data);
-
-    if (data < root->data)
-        root->left = insert(root->left, data);
-    else if (data > root->data)
-        root->right = insert(root->right, data);
-
-    return root;
+struct StackNode* createStackNode(struct TreeNode* treeNode) {
+    struct StackNode* newNode = (struct StackNode*)malloc(sizeof(struct StackNode));
+    newNode->treeNode = treeNode;
+    newNode->next = NULL;
+    return newNode;
 }
 
+struct Stack {
+    struct StackNode* top;
+};
+
+struct Stack* createStack() {
+    struct Stack* stack = (struct Stack*)malloc(sizeof(struct Stack));
+    stack->top = NULL;
+    return stack;
+}
+int isStackEmpty(struct Stack* stack) {
+    return stack->top == NULL;
+}
+
+void push(struct Stack* stack, struct TreeNode* treeNode) {
+    struct StackNode* newNode = createStackNode(treeNode);
+    newNode->next = stack->top;
+    stack->top = newNode;
+}
+
+struct TreeNode* pop(struct Stack* stack) {
+    if (isStackEmpty(stack)) {
+        return NULL;
+    }
+    struct StackNode* temp = stack->top;
+    struct TreeNode* treeNode = temp->treeNode;
+    stack->top = temp->next;
+    free(temp);
+    return treeNode;
+}
+
+void inorderTraversal(struct TreeNode* root) {
+    if (root == NULL) {
+        return;
+    }
+
+    struct Stack* stack = createStack();
+    struct TreeNode* current = root;
+
+    while (current != NULL || !isStackEmpty(stack)) {
+        while (current != NULL) {
+            push(stack, current);
+            current = current->left;
+        }
+        current = pop(stack);
+        printf("%d ", current->data);
+        current = current->right;
+    }
+
+    free(stack);
+}
+
+void preorderTraversal(struct TreeNode* root) {
+    if (root == NULL) {
+        return;
+    }
+
+    struct Stack* stack = createStack();
+    push(stack, root);
+
+    while (!isStackEmpty(stack)) {
+        struct TreeNode* current = pop(stack);
+        printf("%d ", current->data);
+        if (current->right) {
+            push(stack, current->right);
+        }
+        if (current->left) {
+            push(stack, current->left);
+        }
+    }
+
+    free(stack);
+}
+void postorderTraversal(struct TreeNode* root) {
+    if (root == NULL) {
+        return;
+    }
+
+    struct Stack* stack1 = createStack();
+    struct Stack* stack2 = createStack();
+    push(stack1, root);
+
+    while (!isStackEmpty(stack1)) {
+        struct TreeNode* current = pop(stack1);
+        push(stack2, current);
+
+        if (current->left) {
+            push(stack1, current->left);
+        }
+        if (current->right) {
+            push(stack1, current->right);
+        }
+    }
+
+    while (!isStackEmpty(stack2)) {
+        struct TreeNode* current = pop(stack2);
+        printf("%d ", current->data);
+    }
+
+    free(stack1);
+    free(stack2);
+}
+
+void insert(struct TreeNode** root, int data) {
+    struct TreeNode* newNode = createNode(data);
+    if (*root == NULL) {
+        *root = newNode;
+    } else {
+        struct TreeNode* current = *root;
+        struct TreeNode* parent = NULL;
+
+        while (current != NULL) {
+            parent = current;
+            if (data < current->data) {
+                current = current->left;
+            } else {
+                current = current->right;
+            }
+        }
+
+        if (data < parent->data) {
+            parent->left = newNode;
+        } else {
+            parent->right = newNode;
+        }
+    }
+}
+
+void freeTree(struct TreeNode* root) {
+    if (root == NULL) {
+        return;
+    }
+
+    freeTree(root->left);
+    freeTree(root->right);
+    free(root);
+}
 
 int main() {
     struct TreeNode* root = NULL;
-    int i,n,value;
+    int data;
+    char choice;
 
-    printf("Enter no of nodes=");
-    scanf("%d",&i);
-    for(i=1;i<n;i++)
-    {
-        printf("Enter value of nodes=");
-        scanf("%d",&value);
-        root = insert(root, value);
-    }
-    /*root = insert(root, 50);
-    insert(root, 30);
-    insert(root, 20);
-    insert(root, 40);
-    insert(root, 70);
-    insert(root, 60);
-    insert(root, 80);
-    */
+    do {
+        printf("Enter an element to insert into the binary tree: ");
+        scanf("%d", &data);
+        insert(&root, data);
 
-    printf("Inorder Traversal: ");
+        printf("Do you want to insert another element? (y/n): ");
+        scanf(" %c", &choice);
+    } while (choice == 'y' || choice == 'Y');
+
+    printf("\nInorder Traversal: ");
     inorderTraversal(root);
-    printf("\n");
 
-    printf("Preorder Traversal: ");
+    printf("\nPreorder Traversal: ");
     preorderTraversal(root);
-    printf("\n");
 
-    printf("Postorder Traversal: ");
+    printf("\nPostorder Traversal: ");
     postorderTraversal(root);
+
     printf("\n");
 
+   
+    freeTree(root);
 
     return 0;
 }
+
+
