@@ -2,25 +2,23 @@
 
 #define MAX_NODES 100
 
-// Array to store keys in the BST
+
 int keys[MAX_NODES];
 
-// Function to insert a key into the BST
 void insert(int rootIndex, int key) {
     if (keys[rootIndex] == 0) {
-        // If the current root is empty, insert the key
+      
         keys[rootIndex] = key;
     } else {
-        // Otherwise, recursively insert into the left or right subtree
+      
         if (key < keys[rootIndex]) {
-            insert(2 * rootIndex + 1, key); // Insert into the left subtree
+            insert(2 * rootIndex + 1, key); 
         } else if (key > keys[rootIndex]) {
-            insert(2 * rootIndex + 2, key); // Insert into the right subtree
+            insert(2 * rootIndex + 2, key);
         }
     }
 }
 
-// Function to perform inorder traversal of the BST
 void inorderTraversal(int rootIndex) {
     if (keys[rootIndex] != 0) {
         inorderTraversal(2 * rootIndex + 1); // Traverse left subtree
@@ -30,14 +28,18 @@ void inorderTraversal(int rootIndex) {
 }
 
 int main() {
-    // Inserting keys into the BST
-    insert(0, 50);
-    insert(0, 30);
-    insert(0, 20);
-    insert(0, 40);
-    insert(0, 70);
-    insert(0, 60);
-    insert(0, 80);
+    int key;
+    char choice;
+
+    do {
+        printf("Enter key to insert into the BST: ");
+        scanf("%d", &key);
+        insert(0, key);
+
+        printf("Do you want to insert another key? (y/n): ");
+        scanf(" %c", &choice); // Notice the space before %c to consume the newline character
+
+    } while (choice == 'y' || choice == 'Y');
 
     // Performing inorder traversal to display the sorted keys
     printf("Inorder Traversal: ");
