@@ -1,129 +1,119 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-struct Node {
+
+struct TreeNode {
     int data;
-    struct Node* left;
-    struct Node* right;
+    struct TreeNode* left;
+    struct TreeNode* right;
 };
 
-struct Node* createNode(int data) {
-    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
-    newNode->data = data;
+struct TreeNode* createNode(int val) {
+    struct TreeNode* newNode = (struct TreeNode*)malloc(sizeof(struct TreeNode));
+    newNode->data = val;
     newNode->left = NULL;
     newNode->right = NULL;
     return newNode;
 }
 
-struct Node* insert(struct Node* root, int data) {
+struct TreeNode* insert(struct TreeNode* root, int val) {
     if (root == NULL) {
-        return createNode(data);
+        return createNode(val);
     }
-
-    if (data < root->data) {
-        root->left = insert(root->left, data);
-    } else if (data > root->data) {
-        root->right = insert(root->right, data);
+    if (val < root->data) {
+        root->left = insert(root->left, val);
+    } else {
+        root->right = insert(root->right, val);
     }
-
     return root;
 }
 
-int Height(struct Node* root) {
+int height(struct TreeNode* root) {
     if (root == NULL) {
         return -1;
     }
-
-    int leftHeight = Height(root->left);
-    int rightHeight = Height(root->right);
-
-    return (leftHeight > rightHeight) ? (leftHeight + 1) : (rightHeight + 1);
+    int leftHeight = height(root->left);
+    int rightHeight = height(root->right);
+    return (leftHeight > rightHeight ? leftHeight : rightHeight) + 1;
 }
 
-int countNodes(struct Node* root) {
+int countNodes(struct TreeNode* root) {
     if (root == NULL) {
         return 0;
     }
-
-    return 1 + countNodes(root->left) + countNodes(root->right);
+    return countNodes(root->left) + countNodes(root->right) + 1;
 }
 
-int countLeaf(struct Node* root) {
+int countLeafNodes(struct TreeNode* root) {
     if (root == NULL) {
         return 0;
     }
-
     if (root->left == NULL && root->right == NULL) {
         return 1;
     }
-
-    return countLeaf(root->left) + countLeaf(root->right);
+    return countLeafNodes(root->left) + countLeafNodes(root->right);
 }
 
-int Minimum(struct Node* root) {
+int findMin(struct TreeNode* root) {
     if (root == NULL) {
-        return -1;
+        printf("Error: Tree is empty\n");
+        return -1; 
     }
-
     while (root->left != NULL) {
         root = root->left;
     }
-
     return root->data;
 }
 
-int Maximum(struct Node* root) {
+int findMax(struct TreeNode* root) {
     if (root == NULL) {
-        return -1;
+        printf("Error: Tree is empty\n");
+        return -1; 
     }
-
     while (root->right != NULL) {
         root = root->right;
     }
-
     return root->data;
 }
 
-void printLeaf(struct Node* root) {
+void printLeafNodes(struct TreeNode* root) {
     if (root == NULL) {
         return;
     }
-
     if (root->left == NULL && root->right == NULL) {
         printf("%d ", root->data);
     }
-
-    printLeaf(root->left);
-    printLeaf(root->right);
+    printLeafNodes(root->left);
+    printLeafNodes(root->right);
 }
 
-void LevelWise(struct Node* root, int level) {
+void printLevelWise(struct TreeNode* root) {
+    if (root == NULL) {
+        return;
+    }
+    struct TreeNode* queue[1000];
+    int front = 0, rear = 0;
+    queue[rear++] = root;
+
+    while (front < rear) {
+        struct TreeNode* currNode = queue[front++];
+        printf("%d ", currNode->data);
+
+        if (currNode->left != NULL) {
+            queue[rear++] = currNode->left;
+        }
+        if (currNode->right != NULL) {
+            queue[rear++] = currNode->right;
+        }
+    }
+}
+
+void mirrorImage(struct TreeNode* root) {
     if (root == NULL) {
         return;
     }
 
-    if (level == 1) {
-        printf("%d ", root->data);
-    } else if (level > 1) {
-        LevelWise(root->left, level - 1);
-        LevelWise(root->right, level - 1);
-    }
-}
-
-void LevelOrder(struct Node* root) {
-    int height = Height(root),i;
-    for (i = 1; i <= height + 1; i++) {
-        LevelWise(root, i);
-        printf("\n");
-    }
-}
-
-void mirrorImage(struct Node* root) {
-    if (root == NULL) {
-        return;
-    }
-
-    struct Node* temp = root->left;
+    struct TreeNode* temp = root->left;
     root->left = root->right;
     root->right = temp;
 
@@ -131,78 +121,65 @@ void mirrorImage(struct Node* root) {
     mirrorImage(root->right);
 }
 
+void deleteTree(struct TreeNode* root) {
+    if (root == NULL) {
+        return;
+    }
+    deleteTree(root->left);
+    deleteTree(root->right);
+    free(root);
+}
+
 int main() {
-    struct Node* root = NULL;
-    int choice, data;
+    struct TreeNode* root = NULL;
+    int choice, value;
 
     do {
-        printf("1. Insert element\n");
-        printf("2. Find height\n");
-        printf("3. Count nodes\n");
-        printf("4. Count leaf nodes\n");
-        printf("5. Find minimum\n");
-        printf("6. Find maximum\n");
-        printf("7. Print leaf nodes\n");
-        printf("8. Print nodes at each level\n");
-        printf("9. Print Mirror image of the tree\n");
-        printf("0. Exit\n");
+        printf("\n1. Insert element\n2. Find Height\n3. Count Nodes\n4. Count Leaf Nodes\n");
+        printf("5. Find Minimum\n6. Find Maximum\n7. Create Mirror Image\n");
+        printf("8. Print Leaf Nodes\n9. Print Nodes Level Wise\n0. Exit\n");
         printf("Enter your choice: ");
         scanf("%d", &choice);
 
         switch (choice) {
             case 1:
-                printf("Enter element: ");
-                scanf("%d", &data);
-                root = insert(root, data);
+                printf("Enter the element to insert: ");
+                scanf("%d", &value);
+                root = insert(root, value);
                 break;
-
             case 2:
-                printf("Height of the tree is: %d\n", Height(root));
+                printf("Height of the BST: %d\n", height(root));
                 break;
-
             case 3:
-                printf("Total number of nodes in the tree is: %d\n", countNodes(root));
+                printf("Number of nodes in the BST: %d\n", countNodes(root));
                 break;
-
             case 4:
-                printf("Total number of leaf nodes in the tree is: %d\n", countLeaf(root));
+                printf("Number of leaf nodes in the BST: %d\n", countLeafNodes(root));
                 break;
-
             case 5:
-                printf("Minimum value in the tree is: %d\n", Minimum(root));
+                printf("Minimum node value: %d\n", findMin(root));
                 break;
-
             case 6:
-                printf("Maximum value in the tree is: %d\n", Maximum(root));
+                printf("Maximum node value: %d\n", findMax(root));
                 break;
-
             case 7:
-                printf("Leaf nodes: ");
-                printLeaf(root);
+                mirrorImage(root);
+                printf("BST after creating a mirror image.\n");
+                break;
+            case 8:
+                printf("Leaf nodes of the BST: ");
+                printLeafNodes(root);
                 printf("\n");
                 break;
-
-            case 8:
-                printf("Nodes level wise:\n");
-                LevelOrder(root);
-                break;
-
             case 9:
-                mirrorImage(root);
-                LevelOrder(root);
-
-                printf("Mirror image of the tree created.\n");
-                break;
-
-            case 0:
-                printf("Exit\n");
-                break;
-
-            default:
-                printf("wrong choice\n");
+                printf("Nodes of the BST level-wise: ");
+                printLevelWise(root);
+                printf("\n");
                 break;
         }
     } while (choice != 0);
+
+    deleteTree(root);
 
     return 0;
 }
