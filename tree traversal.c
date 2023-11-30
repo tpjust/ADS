@@ -6,77 +6,84 @@ struct Node {
     struct Node* left;
     struct Node* right;
 };
-struct Node* createNode(int data) {
+
+struct Node* createNode(int value) {
     struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
-    newNode->data = data;
-    newNode->left = NULL;
-    newNode->right = NULL;
+    newNode->data = value;
+    newNode->left = newNode->right = NULL;
     return newNode;
 }
 
-struct Node* insert(struct Node* root, int data) {
-    if (root == NULL) {
-        return createNode(data);
-    } else {
-        if (data <= root->data)
-            root->left = insert(root->left, data);
-        else
-            root->right = insert(root->right, data);
-    }
+struct Node* insert(struct Node* root, int value) {
+    if (root == NULL)
+        return createNode(value);
+
+    if (value < root->data)
+        root->left = insert(root->left, value);
+    else if (value > root->data)
+        root->right = insert(root->right, value);
+
     return root;
 }
 
-void inorderTraversal(struct Node* root) {
-    if (root == NULL)
-        return;
-
-    inorderTraversal(root->left);
-    printf("%d ", root->data);
-    inorderTraversal(root->right);
+void inorder(struct Node* root) {
+    if (root != NULL) {
+        inorder(root->left);
+        printf("%d ", root->data);
+        inorder(root->right);
+    }
 }
 
-void preorderTraversal(struct Node* root) {
-    if (root == NULL)
-        return;
-
-    printf("%d ", root->data);
-    preorderTraversal(root->left);
-    preorderTraversal(root->right);
+void preorder(struct Node* root) {
+    if (root != NULL) {
+        printf("%d ", root->data);
+        preorder(root->left);
+        preorder(root->right);
+    }
 }
 
-void postorderTraversal(struct Node* root) {
-    if (root == NULL)
-        return;
-
-    postorderTraversal(root->left);
-    postorderTraversal(root->right);
-    printf("%d ", root->data);
+void postorder(struct Node* root) {
+    if (root != NULL) {
+        postorder(root->left);
+        postorder(root->right);
+        printf("%d ", root->data);
+    }
 }
 
 int main() {
     struct Node* root = NULL;
-    int i,n,value;
 
-    printf("Enter no of nodes=");
-    scanf("%d",&i);
-    for(i=1;i<n;i++)
-    {
-        printf("Enter value of nodes=");
-        scanf("%d",&value);
-        root = insert(root, value);
-    }
+    int choice;
+    do {
+        printf("\n1. Insert\n2. Inorder Traversal\n3. Preorder Traversal\n4. Postorder Traversal\n0. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
 
-    printf("Inorder traversal: ");
-    inorderTraversal(root);
-    printf("\n");
-
-    printf("Preorder traversal: ");
-    preorderTraversal(root);
-    printf("\n");
-
-    printf("Postorder traversal: ");
-    postorderTraversal(root);
-    printf("\n");
+        switch (choice) {
+            case 1: {
+                int value;
+                printf("Enter the value to insert: ");
+                scanf("%d", &value);
+                root = insert(root, value);
+                break;
+            }
+            case 2:
+                printf("Inorder Traversal: ");
+                inorder(root);
+                printf("\n");
+                break;
+            case 3:
+                printf("Preorder Traversal: ");
+                preorder(root);
+                printf("\n");
+                break;
+            case 4:
+                printf("Postorder Traversal: ");
+                postorder(root);
+                printf("\n");
+                break;
+        }
+    } while (choice != 0);
 
     return 0;
 }
