@@ -1,10 +1,8 @@
 #include <stdio.h>
 #include <limits.h>
 
-// Number of vertices in the graph
 #define V 5
 
-// Function to find the vertex with the minimum key value
 int minKey(int key[], int mstSet[]) {
     int min = INT_MAX, min_index;
 
@@ -18,7 +16,6 @@ int minKey(int key[], int mstSet[]) {
     return min_index;
 }
 
-// Function to print the constructed MST stored in parent[]
 void printMST(int parent[], int graph[V][V]) {
     printf("Edge   Weight\n");
     for (int i = 1; i < V; i++) {
@@ -26,34 +23,25 @@ void printMST(int parent[], int graph[V][V]) {
     }
 }
 
-// Function to implement Prim's MST algorithm
 void primMST(int graph[V][V]) {
-    int parent[V];   // Array to store constructed MST
-    int key[V];      // Key values used to pick minimum weight edge
-    int mstSet[V];   // To represent set of vertices included in MST
+    int parent[V];
+    int key[V];
+    int mstSet[V];
 
-    // Initialize all keys as INFINITE
-    // and mstSet[] as 0
     for (int i = 0; i < V; i++) {
         key[i] = INT_MAX;
         mstSet[i] = 0;
     }
 
-    // Always include the first vertex in MST.
-    key[0] = 0;       // Make key 0 so that this vertex is picked as the first vertex
-    parent[0] = -1;   // First node is always the root of the MST
+    key[0] = 0;
+    parent[0] = -1;
 
-    // The MST will have V vertices
     for (int count = 0; count < V - 1; count++) {
-        // Pick the minimum key vertex from the set of vertices not yet included in MST
         int u = minKey(key, mstSet);
 
-        // Add the picked vertex to the MST set
         mstSet[u] = 1;
 
-        // Update key value and parent index of the adjacent vertices of the picked vertex
         for (int v = 0; v < V; v++) {
-            // Update key[v] only if the graph[u][v] is smaller than key[v]
             if (graph[u][v] && mstSet[v] == 0 && graph[u][v] < key[v]) {
                 parent[v] = u;
                 key[v] = graph[u][v];
@@ -61,20 +49,19 @@ void primMST(int graph[V][V]) {
         }
     }
 
-    // Print the constructed MST
     printMST(parent, graph);
 }
 
-// Driver program to test above functions
 int main() {
-    // Example graph represented by an adjacency matrix
-    int graph[V][V] = {{0, 2, 0, 6, 0},
-                       {2, 0, 3, 8, 5},
-                       {0, 3, 0, 0, 7},
-                       {6, 8, 0, 0, 9},
-                       {0, 5, 7, 9, 0}};
+    int graph[V][V];
 
-    // Print the MST using Prim's algorithm
+    printf("Enter the adjacency matrix for the graph (%d x %d):\n", V, V);
+    for (int i = 0; i < V; i++) {
+        for (int j = 0; j < V; j++) {
+            scanf("%d", &graph[i][j]);
+        }
+    }
+
     printf("Minimum Spanning Tree using Prim's algorithm:\n");
     primMST(graph);
 
